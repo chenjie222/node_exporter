@@ -1,3 +1,14 @@
+//go:build !nomdadm
+// +build !nomdadm
+
+/*
+ * @Author: your name
+ * @Date: 2021-09-30 10:25:46
+ * @LastEditTime: 2021-09-30 10:46:01
+ * @LastEditors: Please set LastEditors
+ * @Description: In User Settings Edit
+ * @FilePath: /node_exporter/collector/mdadm_linux.go
+ */
 // Copyright 2015 The Prometheus Authors
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,8 +22,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// +build !nomdadm
-
 package collector
 
 import (
@@ -21,7 +30,6 @@ import (
 	"os"
 
 	"github.com/go-kit/log"
-	"github.com/go-kit/log/level"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/procfs"
 )
@@ -111,7 +119,6 @@ func (c *mdadmCollector) Update(ch chan<- prometheus.Metric) error {
 
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
-			level.Debug(c.logger).Log("msg", "Not collecting mdstat, file does not exist", "file", *procPath)
 			return ErrNoData
 		}
 
@@ -119,7 +126,6 @@ func (c *mdadmCollector) Update(ch chan<- prometheus.Metric) error {
 	}
 
 	for _, mdStat := range mdStats {
-		level.Debug(c.logger).Log("msg", "collecting metrics for device", "device", mdStat.Name)
 
 		stateVals := make(map[string]float64)
 		stateVals[mdStat.ActivityState] = 1

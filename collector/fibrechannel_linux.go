@@ -11,8 +11,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// +build linux
-// +build !nofibrechannel
+//go:build linux && !nofibrechannel
+// +build linux,!nofibrechannel
 
 package collector
 
@@ -21,7 +21,6 @@ import (
 	"os"
 
 	"github.com/go-kit/log"
-	"github.com/go-kit/log/level"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/procfs/sysfs"
 )
@@ -110,7 +109,6 @@ func (c *fibrechannelCollector) Update(ch chan<- prometheus.Metric) error {
 	hosts, err := c.fs.FibreChannelClass()
 	if err != nil {
 		if os.IsNotExist(err) {
-			level.Debug(c.logger).Log("msg", "fibrechannel statistics not found, skipping")
 			return ErrNoData
 		}
 		return fmt.Errorf("error obtaining FibreChannel class info: %s", err)

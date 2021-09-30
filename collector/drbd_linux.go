@@ -11,6 +11,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+//go:build !nodrbd
 // +build !nodrbd
 
 package collector
@@ -24,7 +25,6 @@ import (
 	"strings"
 
 	"github.com/go-kit/log"
-	"github.com/go-kit/log/level"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -190,7 +190,6 @@ func (c *drbdCollector) Update(ch chan<- prometheus.Metric) error {
 	file, err := os.Open(statsFile)
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
-			level.Debug(c.logger).Log("msg", "stats file does not exist, skipping", "file", statsFile, "err", err)
 			return ErrNoData
 		}
 
@@ -207,7 +206,6 @@ func (c *drbdCollector) Update(ch chan<- prometheus.Metric) error {
 
 		kv := strings.Split(field, ":")
 		if len(kv) != 2 {
-			level.Debug(c.logger).Log("msg", "skipping invalid key:value pair", "field", field)
 			continue
 		}
 
@@ -273,7 +271,6 @@ func (c *drbdCollector) Update(ch chan<- prometheus.Metric) error {
 			continue
 		}
 
-		level.Debug(c.logger).Log("msg", "unhandled key-value pair", "key", kv[0], "value", kv[1])
 	}
 
 	return scanner.Err()

@@ -1,3 +1,13 @@
+//go:build !nonetdev
+// +build !nonetdev
+
+/*
+ * @Author: your name
+ * @Date: 2021-09-30 10:25:46
+ * @LastEditTime: 2021-09-30 10:39:56
+ * @LastEditors: Please set LastEditors
+ * @FilePath: /node_exporter/collector/netdev_openbsd_amd64.go
+ */
 // Copyright 2020 The Prometheus Authors
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -10,8 +20,6 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
-// +build !nonetdev
 
 package collector
 
@@ -53,7 +61,6 @@ func getNetDevStats(filter *netDevFilter, logger log.Logger) (netDevStats, error
 		data := ifm.Data
 		dev := int8ToString(dl.Data[:dl.Nlen])
 		if filter.ignored(dev) {
-			level.Debug(logger).Log("msg", "Ignoring device", "device", dev)
 			continue
 		}
 

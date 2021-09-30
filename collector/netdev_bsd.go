@@ -1,3 +1,15 @@
+//go:build !nonetdev && (freebsd || dragonfly)
+// +build !nonetdev
+// +build freebsd dragonfly
+
+/*
+ * @Author: your name
+ * @Date: 2021-09-30 10:25:46
+ * @LastEditTime: 2021-09-30 10:39:43
+ * @LastEditors: your name
+ * @Description: In User Settings Edit
+ * @FilePath: /node_exporter/collector/netdev_bsd.go
+ */
 // Copyright 2015 The Prometheus Authors
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -10,9 +22,6 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
-// +build !nonetdev
-// +build freebsd dragonfly
 
 package collector
 
@@ -49,7 +58,6 @@ func getNetDevStats(filter *netDevFilter, logger log.Logger) (netDevStats, error
 
 		dev := C.GoString(ifa.ifa_name)
 		if filter.ignored(dev) {
-			level.Debug(logger).Log("msg", "Ignoring device", "device", dev)
 			continue
 		}
 

@@ -5,8 +5,8 @@
 /*
  * @Author: your name
  * @Date: 2021-09-29 18:43:21
- * @LastEditTime: 2021-09-29 18:50:23
- * @LastEditors: your name
+ * @LastEditTime: 2021-09-30 10:38:59
+ * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /node_exporter@v1.2.0/collector/filesystem_bsd.go
  */
@@ -59,14 +59,12 @@ func (c *filesystemCollector) GetStats() (stats []filesystemStats, err error) {
 	for i := 0; i < int(count); i++ {
 		mountpoint := C.GoString(&mnt[i].f_mntonname[0])
 		if c.excludedMountPointsPattern.MatchString(mountpoint) {
-			level.Debug(c.logger).Log("msg", "Ignoring mount point", "mountpoint", mountpoint)
 			continue
 		}
 
 		device := C.GoString(&mnt[i].f_mntfromname[0])
 		fstype := C.GoString(&mnt[i].f_fstypename[0])
 		if c.excludedFSTypesPattern.MatchString(fstype) {
-			level.Debug(c.logger).Log("msg", "Ignoring fs type", "type", fstype)
 			continue
 		}
 

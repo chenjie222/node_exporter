@@ -11,8 +11,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// +build !nonetclass
-// +build linux
+//go:build !nonetclass && linux
+// +build !nonetclass,linux
 
 package collector
 
@@ -23,7 +23,6 @@ import (
 	"regexp"
 
 	"github.com/go-kit/log"
-	"github.com/go-kit/log/level"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/procfs/sysfs"
 	"gopkg.in/alecthomas/kingpin.v2"
@@ -66,7 +65,6 @@ func (c *netClassCollector) Update(ch chan<- prometheus.Metric) error {
 	netClass, err := c.getNetClassInfo()
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) || errors.Is(err, os.ErrPermission) {
-			level.Debug(c.logger).Log("msg", "Could not read netclass file", "err", err)
 			return ErrNoData
 		}
 		return fmt.Errorf("could not get net class info: %w", err)

@@ -11,6 +11,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+//go:build !notime
 // +build !notime
 
 package collector
@@ -19,7 +20,6 @@ import (
 	"time"
 
 	"github.com/go-kit/log"
-	"github.com/go-kit/log/level"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -57,9 +57,7 @@ func (c *timeCollector) Update(ch chan<- prometheus.Metric) error {
 	nowSec := float64(now.UnixNano()) / 1e9
 	zone, zoneOffset := now.Zone()
 
-	level.Debug(c.logger).Log("msg", "Return time", "now", nowSec)
 	ch <- prometheus.MustNewConstMetric(c.nowDesc, prometheus.GaugeValue, nowSec)
-	level.Debug(c.logger).Log("msg", "Zone offset", "offset", zoneOffset, "time_zone", zone)
 	ch <- prometheus.MustNewConstMetric(c.zoneDesc, prometheus.GaugeValue, float64(zoneOffset), zone)
 	return nil
 }

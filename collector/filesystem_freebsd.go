@@ -11,6 +11,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+//go:build !nofilesystem
 // +build !nofilesystem
 
 package collector
@@ -42,14 +43,12 @@ func (c *filesystemCollector) GetStats() ([]filesystemStats, error) {
 	for _, fs := range buf {
 		mountpoint := bytesToString(fs.Mntonname[:])
 		if c.excludedMountPointsPattern.MatchString(mountpoint) {
-			level.Debug(c.logger).Log("msg", "Ignoring mount point", "mountpoint", mountpoint)
 			continue
 		}
 
 		device := bytesToString(fs.Mntfromname[:])
 		fstype := bytesToString(fs.Fstypename[:])
 		if c.excludedFSTypesPattern.MatchString(fstype) {
-			level.Debug(c.logger).Log("msg", "Ignoring fs type", "type", fstype)
 			continue
 		}
 

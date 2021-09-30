@@ -11,6 +11,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+//go:build !nodiskstats
 // +build !nodiskstats
 
 package collector
@@ -25,7 +26,6 @@ import (
 	"strings"
 
 	"github.com/go-kit/log"
-	"github.com/go-kit/log/level"
 	"github.com/prometheus/client_golang/prometheus"
 	"gopkg.in/alecthomas/kingpin.v2"
 )
@@ -192,7 +192,6 @@ func (c *diskstatsCollector) Update(ch chan<- prometheus.Metric) error {
 
 	for dev, stats := range diskStats {
 		if c.ignoredDevicesPattern.MatchString(dev) {
-			level.Debug(c.logger).Log("msg", "Ignoring device", "device", dev)
 			continue
 		}
 

@@ -11,6 +11,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+//go:build !nocpu
 // +build !nocpu
 
 package collector
@@ -216,12 +217,10 @@ func (c *cpuCollector) updateThermalThrottle(ch chan<- prometheus.Metric) error 
 
 		// topology/physical_package_id
 		if physicalPackageID, err = readUintFromFile(filepath.Join(cpu, "topology", "physical_package_id")); err != nil {
-			level.Debug(c.logger).Log("msg", "CPU is missing physical_package_id", "cpu", cpu)
 			continue
 		}
 		// topology/core_id
 		if coreID, err = readUintFromFile(filepath.Join(cpu, "topology", "core_id")); err != nil {
-			level.Debug(c.logger).Log("msg", "CPU is missing core_id", "cpu", cpu)
 			continue
 		}
 
@@ -239,7 +238,6 @@ func (c *cpuCollector) updateThermalThrottle(ch chan<- prometheus.Metric) error 
 			if coreThrottleCount, err := readUintFromFile(filepath.Join(cpu, "thermal_throttle", "core_throttle_count")); err == nil {
 				packageCoreThrottles[physicalPackageID][coreID] = coreThrottleCount
 			} else {
-				level.Debug(c.logger).Log("msg", "CPU is missing core_throttle_count", "cpu", cpu)
 			}
 		}
 
@@ -249,7 +247,6 @@ func (c *cpuCollector) updateThermalThrottle(ch chan<- prometheus.Metric) error 
 			if packageThrottleCount, err := readUintFromFile(filepath.Join(cpu, "thermal_throttle", "package_throttle_count")); err == nil {
 				packageThrottles[physicalPackageID] = packageThrottleCount
 			} else {
-				level.Debug(c.logger).Log("msg", "CPU is missing package_throttle_count", "cpu", cpu)
 			}
 		}
 	}
@@ -319,68 +316,57 @@ func (c *cpuCollector) updateCPUStats(newStats []procfs.CPUStat) {
 	for i, n := range newStats {
 		// If idle jumps backwards by more than X seconds, assume we had a hotplug event and reset the stats for this CPU.
 		if (c.cpuStats[i].Idle - n.Idle) >= jumpBackSeconds {
-			level.Debug(c.logger).Log("msg", jumpBackDebugMessage, "cpu", i, "old_value", c.cpuStats[i].Idle, "new_value", n.Idle)
 			c.cpuStats[i] = procfs.CPUStat{}
 		}
 
 		if n.Idle >= c.cpuStats[i].Idle {
 			c.cpuStats[i].Idle = n.Idle
 		} else {
-			level.Debug(c.logger).Log("msg", "CPU Idle counter jumped backwards", "cpu", i, "old_value", c.cpuStats[i].Idle, "new_value", n.Idle)
 		}
 
 		if n.User >= c.cpuStats[i].User {
 			c.cpuStats[i].User = n.User
 		} else {
-			level.Debug(c.logger).Log("msg", "CPU User counter jumped backwards", "cpu", i, "old_value", c.cpuStats[i].User, "new_value", n.User)
 		}
 
 		if n.Nice >= c.cpuStats[i].Nice {
 			c.cpuStats[i].Nice = n.Nice
 		} else {
-			level.Debug(c.logger).Log("msg", "CPU Nice counter jumped backwards", "cpu", i, "old_value", c.cpuStats[i].Nice, "new_value", n.Nice)
 		}
 
 		if n.System >= c.cpuStats[i].System {
 			c.cpuStats[i].System = n.System
 		} else {
-			level.Debug(c.logger).Log("msg", "CPU System counter jumped backwards", "cpu", i, "old_value", c.cpuStats[i].System, "new_value", n.System)
 		}
 
 		if n.Iowait >= c.cpuStats[i].Iowait {
 			c.cpuStats[i].Iowait = n.Iowait
 		} else {
-			level.Debug(c.logger).Log("msg", "CPU Iowait counter jumped backwards", "cpu", i, "old_value", c.cpuStats[i].Iowait, "new_value", n.Iowait)
 		}
 
 		if n.IRQ >= c.cpuStats[i].IRQ {
 			c.cpuStats[i].IRQ = n.IRQ
 		} else {
-			level.Debug(c.logger).Log("msg", "CPU IRQ counter jumped backwards", "cpu", i, "old_value", c.cpuStats[i].IRQ, "new_value", n.IRQ)
 		}
 
 		if n.SoftIRQ >= c.cpuStats[i].SoftIRQ {
 			c.cpuStats[i].SoftIRQ = n.SoftIRQ
 		} else {
-			level.Debug(c.logger).Log("msg", "CPU SoftIRQ counter jumped backwards", "cpu", i, "old_value", c.cpuStats[i].SoftIRQ, "new_value", n.SoftIRQ)
 		}
 
 		if n.Steal >= c.cpuStats[i].Steal {
 			c.cpuStats[i].Steal = n.Steal
 		} else {
-			level.Debug(c.logger).Log("msg", "CPU Steal counter jumped backwards", "cpu", i, "old_value", c.cpuStats[i].Steal, "new_value", n.Steal)
 		}
 
 		if n.Guest >= c.cpuStats[i].Guest {
 			c.cpuStats[i].Guest = n.Guest
 		} else {
-			level.Debug(c.logger).Log("msg", "CPU Guest counter jumped backwards", "cpu", i, "old_value", c.cpuStats[i].Guest, "new_value", n.Guest)
 		}
 
 		if n.GuestNice >= c.cpuStats[i].GuestNice {
 			c.cpuStats[i].GuestNice = n.GuestNice
 		} else {
-			level.Debug(c.logger).Log("msg", "CPU GuestNice counter jumped backwards", "cpu", i, "old_value", c.cpuStats[i].GuestNice, "new_value", n.GuestNice)
 		}
 	}
 }

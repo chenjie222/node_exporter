@@ -11,6 +11,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+//go:build !nosupervisord
 // +build !nosupervisord
 
 package collector
@@ -24,7 +25,6 @@ import (
 	"time"
 
 	"github.com/go-kit/log"
-	"github.com/go-kit/log/level"
 	"github.com/mattn/go-xmlrpc"
 	"github.com/prometheus/client_golang/prometheus"
 	"gopkg.in/alecthomas/kingpin.v2"
@@ -171,7 +171,6 @@ func (c *supervisordCollector) Update(ch chan<- prometheus.Metric) error {
 		} else {
 			ch <- prometheus.MustNewConstMetric(c.upDesc, prometheus.GaugeValue, 0, labels...)
 		}
-		level.Debug(c.logger).Log("msg", "process info", "group", info.Group, "name", info.Name, "state", info.StateName, "pid", info.PID)
 	}
 
 	return nil

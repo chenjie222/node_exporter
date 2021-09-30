@@ -1,3 +1,14 @@
+//go:build !nomountstats
+// +build !nomountstats
+
+/*
+ * @Author: your name
+ * @Date: 2021-09-30 10:25:46
+ * @LastEditTime: 2021-09-30 10:46:12
+ * @LastEditors: Please set LastEditors
+ * @Description: In User Settings Edit
+ * @FilePath: /node_exporter/collector/mountstats_linux.go
+ */
 // Copyright 2017 The Prometheus Authors
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,15 +22,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// +build !nomountstats
-
 package collector
 
 import (
 	"fmt"
 
 	"github.com/go-kit/log"
-	"github.com/go-kit/log/level"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/procfs"
 )
@@ -540,7 +548,6 @@ func (c *mountStatsCollector) Update(ch chan<- prometheus.Metric) error {
 		deviceIdentifier := nfsDeviceIdentifier{m.Device, stats.Transport.Protocol, mountAddress}
 		i := deviceList[deviceIdentifier]
 		if i {
-			level.Debug(c.logger).Log("msg", "Skipping duplicate device entry", "device", deviceIdentifier)
 			continue
 		}
 

@@ -11,6 +11,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+//go:build !noconntrack
 // +build !noconntrack
 
 package collector
@@ -21,7 +22,6 @@ import (
 	"os"
 
 	"github.com/go-kit/log"
-	"github.com/go-kit/log/level"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/procfs"
 )
@@ -153,7 +153,6 @@ func (c *conntrackCollector) Update(ch chan<- prometheus.Metric) error {
 
 func (c *conntrackCollector) handleErr(err error) error {
 	if errors.Is(err, os.ErrNotExist) {
-		level.Debug(c.logger).Log("msg", "conntrack probably not loaded")
 		return ErrNoData
 	}
 	return fmt.Errorf("failed to retrieve conntrack stats: %w", err)

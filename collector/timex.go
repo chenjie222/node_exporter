@@ -11,8 +11,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// +build linux
-// +build !notimex
+//go:build linux && !notimex
+// +build linux,!notimex
 
 package collector
 
@@ -22,7 +22,6 @@ import (
 	"os"
 
 	"github.com/go-kit/log"
-	"github.com/go-kit/log/level"
 	"github.com/prometheus/client_golang/prometheus"
 	"golang.org/x/sys/unix"
 )
@@ -167,7 +166,6 @@ func (c *timexCollector) Update(ch chan<- prometheus.Metric) error {
 	status, err := unix.Adjtimex(timex)
 	if err != nil {
 		if errors.Is(err, os.ErrPermission) {
-			level.Debug(c.logger).Log("msg", "Not collecting timex metrics", "err", err)
 			return ErrNoData
 		}
 		return fmt.Errorf("failed to retrieve adjtimex stats: %w", err)

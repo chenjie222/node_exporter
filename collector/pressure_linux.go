@@ -11,6 +11,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+//go:build !nopressure
 // +build !nopressure
 
 package collector
@@ -22,7 +23,6 @@ import (
 	"syscall"
 
 	"github.com/go-kit/log"
-	"github.com/go-kit/log/level"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/procfs"
 )
@@ -88,15 +88,12 @@ func NewPressureStatsCollector(logger log.Logger) (Collector, error) {
 // Update calls procfs.NewPSIStatsForResource for the different resources and updates the values
 func (c *pressureStatsCollector) Update(ch chan<- prometheus.Metric) error {
 	for _, res := range psiResources {
-		level.Debug(c.logger).Log("msg", "collecting statistics for resource", "resource", res)
 		vals, err := c.fs.PSIStatsForResource(res)
 		if err != nil {
 			if errors.Is(err, os.ErrNotExist) {
-				level.Debug(c.logger).Log("msg", "pressure information is unavailable, you need a Linux kernel >= 4.20 and/or CONFIG_PSI enabled for your kernel")
 				return ErrNoData
 			}
 			if errors.Is(err, syscall.ENOTSUP) {
-				level.Debug(c.logger).Log("msg", "pressure information is disabled, add psi=1 kernel command line to enable it")
 				return ErrNoData
 			}
 			return fmt.Errorf("failed to retrieve pressure stats: %w", err)
@@ -111,7 +108,6 @@ func (c *pressureStatsCollector) Update(ch chan<- prometheus.Metric) error {
 			ch <- prometheus.MustNewConstMetric(c.mem, prometheus.CounterValue, float64(vals.Some.Total)/1000.0/1000.0)
 			ch <- prometheus.MustNewConstMetric(c.memFull, prometheus.CounterValue, float64(vals.Full.Total)/1000.0/1000.0)
 		default:
-			level.Debug(c.logger).Log("msg", "did not account for resource", "resource", res)
 		}
 	}
 

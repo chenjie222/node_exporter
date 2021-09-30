@@ -11,8 +11,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// +build linux
-// +build !noinfiniband
+//go:build linux && !noinfiniband
+// +build linux,!noinfiniband
 
 package collector
 
@@ -23,7 +23,6 @@ import (
 	"strconv"
 
 	"github.com/go-kit/log"
-	"github.com/go-kit/log/level"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/procfs/sysfs"
 )
@@ -116,7 +115,6 @@ func (c *infinibandCollector) Update(ch chan<- prometheus.Metric) error {
 	devices, err := c.fs.InfiniBandClass()
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
-			level.Debug(c.logger).Log("msg", "infiniband statistics not found, skipping")
 			return ErrNoData
 		}
 		return fmt.Errorf("error obtaining InfiniBand class info: %w", err)

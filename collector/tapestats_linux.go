@@ -11,6 +11,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+//go:build !notapestats
 // +build !notapestats
 
 package collector
@@ -21,7 +22,6 @@ import (
 	"regexp"
 
 	"github.com/go-kit/log"
-	"github.com/go-kit/log/level"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/procfs/sysfs"
 	"gopkg.in/alecthomas/kingpin.v2"
@@ -125,7 +125,6 @@ func (c *tapestatsCollector) Update(ch chan<- prometheus.Metric) error {
 	tapes, err := c.fs.SCSITapeClass()
 	if err != nil {
 		if os.IsNotExist(err) {
-			level.Debug(c.logger).Log("msg", "scsi_tape stats not found, skipping")
 			return ErrNoData
 		}
 		return fmt.Errorf("error obtaining SCSITape class info: %s", err)
@@ -133,7 +132,6 @@ func (c *tapestatsCollector) Update(ch chan<- prometheus.Metric) error {
 
 	for _, tape := range tapes {
 		if c.ignoredDevicesPattern.MatchString(tape.Name) {
-			level.Debug(c.logger).Log("msg", "Ignoring device", "device", tape.Name)
 			continue
 		}
 		ch <- prometheus.MustNewConstMetric(c.ioNow, prometheus.GaugeValue, float64(tape.Counters.InFlight), tape.Name)

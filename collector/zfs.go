@@ -11,8 +11,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// +build linux
-// +build !nozfs
+//go:build linux && !nozfs
+// +build linux,!nozfs
 
 package collector
 
@@ -21,7 +21,6 @@ import (
 	"strings"
 
 	"github.com/go-kit/log"
-	"github.com/go-kit/log/level"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -70,7 +69,6 @@ func (c *zfsCollector) Update(ch chan<- prometheus.Metric) error {
 
 	if _, err := c.openProcFile(c.linuxProcpathBase); err != nil {
 		if err == errZFSNotAvailable {
-			level.Debug(c.logger).Log("err", err)
 			return ErrNoData
 		}
 	}
@@ -78,7 +76,6 @@ func (c *zfsCollector) Update(ch chan<- prometheus.Metric) error {
 	for subsystem := range c.linuxPathMap {
 		if err := c.updateZfsStats(subsystem, ch); err != nil {
 			if err == errZFSNotAvailable {
-				level.Debug(c.logger).Log("err", err)
 				// ZFS /proc files are added as new features to ZFS arrive, it is ok to continue
 				continue
 			}

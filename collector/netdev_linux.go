@@ -1,3 +1,14 @@
+//go:build !nonetdev
+// +build !nonetdev
+
+/*
+ * @Author: your name
+ * @Date: 2021-09-30 10:25:46
+ * @LastEditTime: 2021-09-30 10:46:21
+ * @LastEditors: your name
+ * @Description: In User Settings Edit
+ * @FilePath: /node_exporter/collector/netdev_linux.go
+ */
 // Copyright 2015 The Prometheus Authors
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,8 +22,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// +build !nonetdev
-
 package collector
 
 import (
@@ -25,7 +34,6 @@ import (
 	"strings"
 
 	"github.com/go-kit/log"
-	"github.com/go-kit/log/level"
 )
 
 var (
@@ -67,7 +75,6 @@ func parseNetDevStats(r io.Reader, filter *netDevFilter, logger log.Logger) (net
 
 		dev := parts[1]
 		if filter.ignored(dev) {
-			level.Debug(logger).Log("msg", "Ignoring device", "device", dev)
 			continue
 		}
 
@@ -80,7 +87,6 @@ func parseNetDevStats(r io.Reader, filter *netDevFilter, logger log.Logger) (net
 		addStats := func(key, value string) {
 			v, err := strconv.ParseUint(value, 0, 64)
 			if err != nil {
-				level.Debug(logger).Log("msg", "invalid value in netstats", "key", key, "value", value, "err", err)
 				return
 			}
 

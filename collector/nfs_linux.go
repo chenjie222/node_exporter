@@ -1,3 +1,14 @@
+//go:build !nonfs
+// +build !nonfs
+
+/*
+ * @Author: your name
+ * @Date: 2021-09-30 10:25:46
+ * @LastEditTime: 2021-09-30 10:46:26
+ * @LastEditors: Please set LastEditors
+ * @Description: In User Settings Edit
+ * @FilePath: /node_exporter/collector/nfs_linux.go
+ */
 // Copyright 2016 The Prometheus Authors
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,8 +22,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// +build !nonfs
-
 package collector
 
 import (
@@ -22,7 +31,6 @@ import (
 	"reflect"
 
 	"github.com/go-kit/log"
-	"github.com/go-kit/log/level"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/procfs/nfs"
 )
@@ -99,7 +107,6 @@ func (c *nfsCollector) Update(ch chan<- prometheus.Metric) error {
 	stats, err := c.fs.ClientRPCStats()
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
-			level.Debug(c.logger).Log("msg", "Not collecting NFS metrics", "err", err)
 			return ErrNoData
 		}
 		return fmt.Errorf("failed to retrieve nfs stats: %w", err)

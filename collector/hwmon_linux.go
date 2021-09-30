@@ -1,3 +1,14 @@
+//go:build !nohwmon
+// +build !nohwmon
+
+/*
+ * @Author: your name
+ * @Date: 2021-09-30 10:25:46
+ * @LastEditTime: 2021-09-30 10:45:38
+ * @LastEditors: Please set LastEditors
+ * @Description: In User Settings Edit
+ * @FilePath: /node_exporter/collector/hwmon_linux.go
+ */
 // Copyright 2016 The Prometheus Authors
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,8 +22,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// +build !nohwmon
-
 package collector
 
 import (
@@ -25,7 +34,6 @@ import (
 	"strings"
 
 	"github.com/go-kit/log"
-	"github.com/go-kit/log/level"
 	"github.com/prometheus/client_golang/prometheus"
 	"golang.org/x/sys/unix"
 )
@@ -425,7 +433,6 @@ func (c *hwMonCollector) Update(ch chan<- prometheus.Metric) error {
 	hwmonFiles, err := ioutil.ReadDir(hwmonPathName)
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
-			level.Debug(c.logger).Log("msg", "hwmon collector metrics are not available for this system")
 			return ErrNoData
 		}
 

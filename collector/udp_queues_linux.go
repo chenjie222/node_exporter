@@ -11,6 +11,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+//go:build !noudp_queues
 // +build !noudp_queues
 
 package collector
@@ -21,7 +22,6 @@ import (
 	"os"
 
 	"github.com/go-kit/log"
-	"github.com/go-kit/log/level"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/procfs"
 )
@@ -63,7 +63,6 @@ func (c *udpQueuesCollector) Update(ch chan<- prometheus.Metric) error {
 		ch <- prometheus.MustNewConstMetric(c.desc, prometheus.GaugeValue, float64(s4.RxQueueLength), "rx", "v4")
 	} else {
 		if errors.Is(errIPv4, os.ErrNotExist) {
-			level.Debug(c.logger).Log("msg", "not collecting ipv4 based metrics")
 		} else {
 			return fmt.Errorf("couldn't get udp queued bytes: %w", errIPv4)
 		}
@@ -75,7 +74,6 @@ func (c *udpQueuesCollector) Update(ch chan<- prometheus.Metric) error {
 		ch <- prometheus.MustNewConstMetric(c.desc, prometheus.GaugeValue, float64(s6.RxQueueLength), "rx", "v6")
 	} else {
 		if errors.Is(errIPv6, os.ErrNotExist) {
-			level.Debug(c.logger).Log("msg", "not collecting ipv6 based metrics")
 		} else {
 			return fmt.Errorf("couldn't get udp6 queued bytes: %w", errIPv6)
 		}

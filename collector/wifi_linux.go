@@ -11,6 +11,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+//go:build !nowifi
 // +build !nowifi
 
 package collector
@@ -24,7 +25,6 @@ import (
 	"path/filepath"
 
 	"github.com/go-kit/log"
-	"github.com/go-kit/log/level"
 	"github.com/mdlayher/wifi"
 	"github.com/prometheus/client_golang/prometheus"
 	"gopkg.in/alecthomas/kingpin.v2"
@@ -169,11 +169,9 @@ func (c *wifiCollector) Update(ch chan<- prometheus.Metric) error {
 	if err != nil {
 		// Cannot access wifi metrics, report no error.
 		if errors.Is(err, os.ErrNotExist) {
-			level.Debug(c.logger).Log("msg", "wifi collector metrics are not available for this system")
 			return ErrNoData
 		}
 		if errors.Is(err, os.ErrPermission) {
-			level.Debug(c.logger).Log("msg", "wifi collector got permission denied when accessing metrics")
 			return ErrNoData
 		}
 
@@ -192,8 +190,6 @@ func (c *wifiCollector) Update(ch chan<- prometheus.Metric) error {
 			continue
 		}
 
-		level.Debug(c.logger).Log("msg", "probing wifi device with type", "wifi", ifi.Name, "type", ifi.Type)
-
 		ch <- prometheus.MustNewConstMetric(
 			c.interfaceFrequencyHertz,
 			prometheus.GaugeValue,
@@ -210,7 +206,6 @@ func (c *wifiCollector) Update(ch chan<- prometheus.Metric) error {
 		case err == nil:
 			c.updateBSSStats(ch, ifi.Name, bss)
 		case errors.Is(err, os.ErrNotExist):
-			level.Debug(c.logger).Log("msg", "BSS information not found for wifi device", "name", ifi.Name)
 		default:
 			return fmt.Errorf("failed to retrieve BSS for device %s: %v",
 				ifi.Name, err)
@@ -223,7 +218,6 @@ func (c *wifiCollector) Update(ch chan<- prometheus.Metric) error {
 				c.updateStationStats(ch, ifi.Name, station)
 			}
 		case errors.Is(err, os.ErrNotExist):
-			level.Debug(c.logger).Log("msg", "station information not found for wifi device", "name", ifi.Name)
 		default:
 			return fmt.Errorf("failed to retrieve station info for device %q: %v",
 				ifi.Name, err)

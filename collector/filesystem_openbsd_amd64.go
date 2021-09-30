@@ -11,8 +11,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// +build openbsd
-// +build !nofilesystem
+//go:build openbsd && !nofilesystem
+// +build openbsd,!nofilesystem
 
 package collector
 
@@ -43,14 +43,12 @@ func (c *filesystemCollector) GetStats() (stats []filesystemStats, err error) {
 	for _, v := range mnt {
 		mountpoint := int8ToString(v.F_mntonname[:])
 		if c.excludedMountPointsPattern.MatchString(mountpoint) {
-			level.Debug(c.logger).Log("msg", "Ignoring mount point", "mountpoint", mountpoint)
 			continue
 		}
 
 		device := int8ToString(v.F_mntfromname[:])
 		fstype := int8ToString(v.F_fstypename[:])
 		if c.excludedFSTypesPattern.MatchString(fstype) {
-			level.Debug(c.logger).Log("msg", "Ignoring fs type", "type", fstype)
 			continue
 		}
 

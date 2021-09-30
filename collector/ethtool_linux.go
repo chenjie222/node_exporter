@@ -11,6 +11,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+//go:build !noethtool
 // +build !noethtool
 
 // The hard work of collecting data from the kernel via the ethtool interfaces is done by
@@ -125,7 +126,6 @@ func (c *ethtoolCollector) Update(ch chan<- prometheus.Metric) error {
 	netClass, err := c.fs.NetClass()
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) || errors.Is(err, os.ErrPermission) {
-			level.Debug(c.logger).Log("msg", "Could not read netclass file", "err", err)
 			return ErrNoData
 		}
 		return fmt.Errorf("could not get net class info: %w", err)
@@ -146,7 +146,6 @@ func (c *ethtoolCollector) Update(ch chan<- prometheus.Metric) error {
 		if err != nil {
 			if errno, ok := err.(syscall.Errno); ok {
 				if err == unix.EOPNOTSUPP {
-					level.Debug(c.logger).Log("msg", "ethtool stats error", "err", err, "device", device, "errno", uint(errno))
 				} else if errno != 0 {
 					level.Error(c.logger).Log("msg", "ethtool stats error", "err", err, "device", device, "errno", uint(errno))
 				}
